@@ -69,7 +69,8 @@ WORKDIR $APPS_HOME/$APPNAME
 # Add source for R to sources.list first
 RUN echo "deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/" >> /etc/apt/sources.list
 
-RUN apt-get install cmake && \ 
+RUN apt-get install -y --no-install-recommends \
+  cmake \ 
   r-base
 
 # Download EnTAP and build included deps
