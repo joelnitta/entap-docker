@@ -57,3 +57,35 @@ RUN echo '#!/bin/bash' >> /usr/local/bin/$TOOLNAME && \
   echo "conda activate openjdk" >> /usr/local/bin/$TOOLNAME  && \
   echo "$APPS_HOME/$APPNAME/$APPNAME-$VERSION/$TOOLNAME \"\$@\"" >> /usr/local/bin/$TOOLNAME  && \
   chmod 755 /usr/local/bin/$TOOLNAME
+
+### EnTAP ###
+
+ENV APPNAME=EnTAP
+ENV VERSION=v0.10.7-beta
+RUN mkdir $APPS_HOME/$APPNAME
+WORKDIR $APPS_HOME/$APPNAME
+
+# Install apt deps for EnTAP      
+# Add source for R to sources.list first
+RUN echo "deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/" >> /etc/apt/sources.list
+
+RUN apt-get install cmake && \ 
+  r-base
+
+# Download EnTAP and build included deps
+# https://entap.readthedocs.io/en/latest/Getting_Started/installation.html
+RUN wget https://gitlab.com/enTAP/EnTAP/-/archive/$VERSION/$APPNAME-$VERSION.tar.gz && \
+  tar -xzf $APPNAME-$VERSION.tar.gz && \
+  cd $APPS_HOME/$APPNAME/$APPNAME-$VERSION/libs/diamond-0.9.9 && \
+  mkdir bin && \
+  cd bin && \
+  cmake .. && \
+  cd $APPS_HOME/$APPNAME/$APPNAME-$VERSION/libs/RSEM-1.3.0 && \
+  make && \
+  make ebseq && \
+  make install && \
+  cd $APPS_HOME/$APPNAME/$APPNAME-$VERSION/ && \
+  cmake CMakeLists.txt && \
+  make
+
+WORKDIR /root
