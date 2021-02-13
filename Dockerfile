@@ -40,6 +40,7 @@ WORKDIR $APPS_HOME/$APPNAME
 
 RUN wget ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/$VERSION/$APPNAME-$VERSION-64-bit.tar.gz && \
     tar -pxzf $APPNAME-$VERSION-*-bit.tar.gz && \
+    rm $APPNAME-$VERSION-*-bit.tar.gz && \
     cd $APPNAME-$VERSION && \
     python3 initial_setup.py
 
