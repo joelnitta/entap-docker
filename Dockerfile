@@ -39,6 +39,32 @@ RUN MINICONDA_VERSION=py37_4.9.2 && \
 ENV APPS_HOME=/apps
 RUN mkdir $APPS_HOME
 
+### Diamond ###
+RUN APPNAME=diamond && \
+    VERSION=v2.0.7 && \
+    mkdir $APPS_HOME/$APPNAME && \
+    cd $APPS_HOME/$APPNAME && \
+    wget https://github.com/bbuchfink/$APPNAME/releases/download/$VERSION/$APPNAME-linux64.tar.gz && \
+    tar -xzf $APPNAME-linux64.tar.gz && \
+    rm $APPNAME-linux64.tar.gz 
+
+ENV PATH=/apps/diamond/:$PATH
+
+### TransDecoder ###
+# use v5.3.0 as specified in EnTAP docs 
+RUN APPNAME=TransDecoder && \
+    VERSION=v5.3.0 && \
+    mkdir $APPS_HOME/$APPNAME && \
+    cd $APPS_HOME/$APPNAME && \
+    wget https://github.com/$APPNAME/$APPNAME/archive/$APPNAME-$VERSION.tar.gz && \
+    tar -xzf $APPNAME-$VERSION.tar.gz && \
+    rm $APPNAME-$VERSION.tar.gz && \
+# need to install a missing perl module
+    cpan App::cpanminus && \
+    cpanm URI::Escape
+
+ENV PATH=/apps/TransDecoder/TransDecoder-TransDecoder-v5.3.0/:$PATH
+
 ### EnTAP ###
 
 # Download EnTAP and build included deps
@@ -50,11 +76,6 @@ RUN APPNAME=EnTAP && \
   wget https://gitlab.com/enTAP/EnTAP/-/archive/$VERSION/$APPNAME-$VERSION.tar.gz && \
   tar -xzf $APPNAME-$VERSION.tar.gz && \
   rm $APPNAME-$VERSION.tar.gz && \
-  # install diamond
-  cd $APPS_HOME/$APPNAME/$APPNAME-$VERSION/libs/diamond-0.9.9 && \
-  mkdir bin && \
-  cd bin && \
-  cmake .. && \
   # install RSEM
   cd $APPS_HOME/$APPNAME/$APPNAME-$VERSION/libs/RSEM-1.3.0 && \
   make && \
@@ -64,3 +85,4 @@ RUN APPNAME=EnTAP && \
   cmake CMakeLists.txt && \
   make
 
+ENV PATH=/apps/EnTAP/EnTAP-v0.10.7-beta/:$PATH
