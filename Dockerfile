@@ -64,29 +64,3 @@ RUN APPNAME=EnTAP && \
   cmake CMakeLists.txt && \
   make
 
-### InterProScan ###
-
-RUN APPNAME=interproscan && \
-    VERSION=5.48-83.0 && \
-    mkdir $APPS_HOME/$APPNAME && \
-    cd $APPS_HOME/$APPNAME && \
-# Download
-    wget ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/$VERSION/$APPNAME-$VERSION-64-bit.tar.gz && \
-    tar -pxzf $APPNAME-$VERSION-*-bit.tar.gz && \
-    rm $APPNAME-$VERSION-*-bit.tar.gz && \
-    cd $APPS_HOME/$APPNAME/$APPNAME-$VERSION && \
-# Run setup script
-    python3 initial_setup.py && \
-# Build conda environment including java11 for InterProScan && \
-    conda update --name base --channel defaults conda && \
-    conda create -c conda-forge -n openjdk openjdk=11.* && \
-    conda clean --all --yes && \
-# Make shell script to run interproscan.sh in conda environment ###
-# so that java11 is availabale
-    TOOLNAME=interproscan.sh && \
-    echo '#!/bin/bash' >> /usr/local/bin/$TOOLNAME && \
-    echo "source $CONDA_DIR/etc/profile.d/conda.sh" >> /usr/local/bin/$TOOLNAME && \
-    echo "conda activate openjdk" >> /usr/local/bin/$TOOLNAME  && \
-    echo "$APPS_HOME/$APPNAME/$APPNAME-$VERSION/$TOOLNAME \"\$@\"" >> /usr/local/bin/$TOOLNAME  && \
-    chmod 755 /usr/local/bin/$TOOLNAME
-
