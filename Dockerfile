@@ -70,7 +70,7 @@ ENV PATH=/apps/TransDecoder/TransDecoder-TransDecoder-v5.3.0/:$PATH
 # Download EnTAP and build included deps
 # https://entap.readthedocs.io/en/latest/Getting_Started/installation.html
 RUN APPNAME=EnTAP && \
-  VERSION=v0.10.7-beta && \
+  VERSION=v0.10.8-beta && \
   mkdir $APPS_HOME/$APPNAME && \
   cd $APPS_HOME/$APPNAME && \
   wget https://gitlab.com/enTAP/EnTAP/-/archive/$VERSION/$APPNAME-$VERSION.tar.gz && \
