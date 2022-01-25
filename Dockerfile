@@ -12,9 +12,11 @@ RUN apt-get update && \
 # Add source for R to sources.list
   echo "deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/" >> /etc/apt/sources.list && \
   apt-get install -y --no-install-recommends \
-# cmake for EnTAP, R for RSEM->EnTAP
+# cmake for EnTAP, R gfortran libblas-dev for RSEM->EnTAP
   cmake \ 
-  r-base
+  r-base \
+  gfortran \
+  libblas-dev
 
 #########################
 ### install miniconda ###
@@ -65,6 +67,24 @@ RUN APPNAME=TransDecoder && \
 
 ENV PATH=/apps/TransDecoder/TransDecoder-TransDecoder-v5.3.0/:$PATH
 
+### RSem ###
+# v1.3.3 is bundled with EnTAP v.0.10.8-beta but lacks make file
+# need to manually run install.packages("blockmodeling") or will get error
+# https://github.com/deweylab/RSEM/issues/162
+# 
+RUN APPNAME=RSEM && \
+    VERSION=1.3.3 && \
+    mkdir $APPS_HOME/$APPNAME && \
+    cd $APPS_HOME/$APPNAME && \
+    wget https://github.com/deweylab/$APPNAME/archive/refs/tags/v$VERSION.tar.gz && \
+    tar -xzf v$VERSION.tar.gz && \
+    rm v$VERSION.tar.gz && \
+    cd $APPNAME-$VERSION && \
+    Rscript -e 'install.packages("blockmodeling")' \
+    make && \
+    make ebseq && \
+    make install
+
 ### EnTAP ###
 
 # Download EnTAP and build included deps
@@ -76,13 +96,8 @@ RUN APPNAME=EnTAP && \
   wget https://gitlab.com/enTAP/EnTAP/-/archive/$VERSION/$APPNAME-$VERSION.tar.gz && \
   tar -xzf $APPNAME-$VERSION.tar.gz && \
   rm $APPNAME-$VERSION.tar.gz && \
-  # install RSEM
-  cd $APPS_HOME/$APPNAME/$APPNAME-$VERSION/libs/RSEM-1.3.0 && \
-  make && \
-  make ebseq && \
-  make install && \
   cd $APPS_HOME/$APPNAME/$APPNAME-$VERSION/ && \
   cmake CMakeLists.txt && \
   make
 
-ENV PATH=/apps/EnTAP/EnTAP-v0.10.7-beta/:$PATH
+ENV PATH=/apps/EnTAP/EnTAP-v0.10.8-beta/:$PATH
